@@ -13,13 +13,20 @@ int dijkstra(Graph graph, int source_vertex, int destiny_vertex){
 
     // Initialize distance map
     std::vector<bool> visited(num_verts, false);
-    visited[source_vertex] = true;
 
     // Initialize priority queue
     KHeap priority_queue(num_verts);
     priority_queue.insert(source_vertex, 0);
 
-    while(priority_queue)
+    while(priority_queue.get_size() > 0){
+        Node min_node = priority_queue.deletemin();
+        int u = min_node.vertex;
+        int dist_u = min_node.dist;
+        visited[u] = true;
+
+        
+
+    }
     
 
 
