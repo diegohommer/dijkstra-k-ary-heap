@@ -3,6 +3,10 @@
 #include <unordered_map> 
 #include <vector>
 
+struct Node {
+    int vertex, dist;
+};
+
 class Graph {
 	public:
 		void read_dimacs(std::istream& in) {
@@ -22,22 +26,28 @@ class Graph {
 					unsigned u,v,w;
 					char ac;
 					arc >> ac >> u >> v >> w;
-					this->add_edge(u,v,w); // process edge (u,v) with weight w
+					this->add_edge(u-1,v-1,w); // process edge (u,v) with weight w
 				}
 			}
 		}
 
+		std::vector<Node> get_neighbours(int vertex){
+			return adjacency_list[vertex];
+		}
+
+		int get_total_vertices(){
+			return n;
+		}
+
 	private:
-		std::vector<std::unordered_map<int,int>> adjacency_list;
-		unsigned m, n;
+		std::vector<std::vector<Node>> adjacency_list;
+		unsigned n, m;
 
 		void add_edge(int origin, int destiny, int weight){
-			adjacency_list[origin][destiny] = weight;
+			adjacency_list[origin].push_back(Node{destiny,weight});
 		}
 
 		void resize(unsigned n){
 			adjacency_list.resize(n);
 		}
-}
-
-
+};

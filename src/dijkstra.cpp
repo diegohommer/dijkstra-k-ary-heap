@@ -4,12 +4,11 @@
 #include <iostream>
 using namespace boost;
 
+#include "graph.cpp"
 #include "heap.cpp"
 
-typedef adjacency_list<vecS, vecS, directedS> Graph;
-
 int dijkstra(Graph graph, int source_vertex, int destiny_vertex){
-    int num_verts = num_vertices(graph);
+    int num_verts = graph.get_total_vertices();
 
     // Initialize distance map
     std::vector<bool> visited(num_verts, false);
@@ -18,35 +17,29 @@ int dijkstra(Graph graph, int source_vertex, int destiny_vertex){
     KHeap priority_queue(num_verts);
     priority_queue.insert(source_vertex, 0);
 
-    while(priority_queue.get_size() > 0){
-        Node min_node = priority_queue.deletemin();
-        int u = min_node.vertex;
-        int dist_u = min_node.dist;
-        visited[u] = true;
-
-        
-
-    }
+    while (priority_queue.get_size() > 0) {
+        // Extract the node with the minimum distance
+        Node current = priority_queue.deletemin();
+        int v = current.vertex;
+        int v_min = current.dist;
+        visited[v] = true;
     
-
-
+        // Process each neighbor of the current vertex
+        for (const Node& neighbor : graph.get_neighbours(v)) {
+            int u = neighbor.vertex;
+            int weight = neighbor.dist;
+    
+            if (!visited[u]) {
+                int u_min = priority_queue.get_vertex_dist(u);
+    
+                if (u_min == std::numeric_limits<int>::max()) {  
+                    priority_queue.insert(u, v_min + weight);
+                } else if (v_min + weight < u_min) {  
+                    priority_queue.update(u, v_min + weight);
+                }
+            }
+        }
+    }
 
     return 0;
 }
-
-
-// 1 ds := 0; dv := ∞, ∀v ∈ V \ {s}
-// 2 visited(v) := false, ∀v ∈ V
-// 3 Q := ∅
-// 4 insert(Q, (s, 0))
-// 5 while Q̸ = ∅ do
-// 6 v := deletemin(Q)
-// 7 visited(v) := true
-// 8 for u ∈ N+(v) do
-// 9 if not visited(u) then
-// 10 if du = ∞ then
-// 11 du := dv + dvu
-// 12 insert(Q, (u, du))
-// 13 else if dv + dvu < du
-// 3Na hipótese razoável que m ≥ n.
-// 9

@@ -16,6 +16,13 @@ class KHeap {
 
         KHeap(int total_vertices) : pos(total_vertices, -1){}
 
+        int get_vertex_dist(int vertex){
+            if (pos[vertex] == -1) { 
+                return std::numeric_limits<int>::max(); 
+            }
+            return heap[pos[vertex]].dist;
+        }
+
         Node deletemin(){
             Node min = heap.front();
             pos[min.vertex] = -1;
