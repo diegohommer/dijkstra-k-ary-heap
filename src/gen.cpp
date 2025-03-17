@@ -6,6 +6,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <fstream>
 using namespace std;
 
 #include <boost/graph/adjacency_list.hpp>
@@ -59,8 +60,21 @@ int main(int argc, char *argv[]) {
   dijkstra_shortest_paths(g, src, weight_map(get(&EdgeInformation::weight, g)).distance_map(&dist[0]).predecessor_map(&pred[0]));
   cerr << "Distance between " << src + 1 << " and " << dst + 1 << " is " << dist[dst] << endl;
 
-  // (3) print out in DIMACS challenge format
-  cout << "p sp " << num_vertices(g) << " " << num_edges(g) << endl;
+  // (3) Generate dynamic filename
+  std::string filename = "../tests/test_" + std::to_string(num_vertices(g)) + "_" + std::to_string(num_edges(g)) + ".csv";
+  
+  // Open file for writing
+  std::ofstream output(filename);
+  if (!output) {
+      std::cerr << "Error: Could not open file " << filename << " for writing." << std::endl;
+      return 1;
+  }
+
+  // Write to the file
+  output << "p sp " << num_vertices(g) << " " << num_edges(g) << std::endl;
   for (auto [eb, ee] = edges(g); eb != ee; eb++)
-    cout << "a " << source(*eb, g) + 1 << " " << target(*eb, g) + 1 << " " << g[*eb].weight << endl;
+      output << "a " << source(*eb, g) + 1 << " " << target(*eb, g) + 1 << " " << g[*eb].weight << std::endl;
+
+  output.close();
+  std::cout << "Output written to " << filename << std::endl;
 }

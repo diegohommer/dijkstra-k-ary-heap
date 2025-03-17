@@ -3,18 +3,16 @@
 #include <limits>
 #include <unordered_map>
 
-struct Node {
+struct HeapNode {
     int vertex, dist;
-    bool operator<(const Node& other) const {
+    bool operator<(const HeapNode& other) const {
         return dist < other.dist;  
     }
 };
 
 class KHeap {
     public:
-        static const int k = 3;
-
-        KHeap(int total_vertices) : pos(total_vertices, -1){}
+        KHeap(int total_vertices, int k) : pos(total_vertices, -1), k(k){}
 
         int get_vertex_dist(int vertex){
             if (pos[vertex] == -1) { 
@@ -23,35 +21,40 @@ class KHeap {
             return heap[pos[vertex]].dist;
         }
 
-        Node deletemin(){
-            Node min = heap.front();
-            pos[min.vertex] = -1;
+        HeapNode deletemin(){
+            HeapNode min = heap.front();
             swap_nodes(0, heap.size()-1);
+            pos[min.vertex] = -1;
             heap.pop_back();
-            sift_down(0);
+            heapify_down(0);
             return min;
         }
 
         void update(int vertex, int dist){
             int vertex_index = pos[vertex];
-            heap[vertex_index] = Node{vertex,dist};
-            sift_up(vertex_index);
-            sift_down(vertex_index);
+            heap[vertex_index] = HeapNode{vertex,dist};
+            heapify_up(vertex_index);
         }
 
         void insert(int vertex, int dist){
-            heap.push_back(Node{vertex,dist});
+            heap.push_back(HeapNode{vertex,dist});
             pos[vertex] = heap.size()-1;
-            sift_up(heap.size()-1);
+            heapify_up(heap.size()-1);
         }
 
         int get_size(){
             return heap.size();
         }
 
+        void set_k(int k){
+            this->k = k;
+        }
+
     private:
-        std::vector<Node> heap;
+        int k = 3;
+        std::vector<HeapNode> heap;
         std::vector<int> pos;
+        
 
         void swap_nodes(int index, int index2){
             int v1 = heap[index].vertex;
@@ -61,7 +64,7 @@ class KHeap {
             std::swap(pos[v1], pos[v2]);            // Swap hash indexes
         }
         
-        void sift_up(int index) {
+        void heapify_up(int index) {
             while(index > 0){
                 int parent = (index - 1) / k;
 
@@ -74,7 +77,7 @@ class KHeap {
             }
         }
 
-        void sift_down(int index) {
+        void heapify_down(int index) {
             while(true){
                 int min = index;
 

@@ -3,7 +3,7 @@
 #include <unordered_map> 
 #include <vector>
 
-struct Node {
+struct Edge {
     int vertex, dist;
 };
 
@@ -31,7 +31,7 @@ class Graph {
 			}
 		}
 
-		std::vector<Node> get_neighbours(int vertex){
+		std::vector<Edge> get_neighbours(int vertex){
 			return adjacency_list[vertex];
 		}
 
@@ -39,12 +39,16 @@ class Graph {
 			return n;
 		}
 
+		int get_total_edges(){
+			return m;
+		}
+
 	private:
-		std::vector<std::vector<Node>> adjacency_list;
+		std::vector<std::vector<Edge>> adjacency_list;
 		unsigned n, m;
 
 		void add_edge(int origin, int destiny, int weight){
-			adjacency_list[origin].push_back(Node{destiny,weight});
+			adjacency_list[origin].push_back(Edge{destiny,weight});
 		}
 
 		void resize(unsigned n){
