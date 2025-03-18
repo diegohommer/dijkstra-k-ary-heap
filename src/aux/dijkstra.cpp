@@ -18,6 +18,8 @@ DijkstraResult dijkstra(Graph graph, int source_vertex, int destiny_vertex, int 
 
     // Initialize distance map
     std::vector<bool> visited(num_verts, false);
+    std::vector<int> distances(num_verts, std::numeric_limits<int>::max());
+    distances[0] = 0;
 
     // Initialize priority queue
     KHeap priority_queue(num_verts,k);
@@ -52,5 +54,5 @@ DijkstraResult dijkstra(Graph graph, int source_vertex, int destiny_vertex, int 
         }
     }
 
-    return DijkstraResult{0,inserts,deletemins,updates};
+    return DijkstraResult{distances[destiny_vertex],inserts,deletemins,updates};
 }
