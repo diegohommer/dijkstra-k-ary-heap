@@ -1,10 +1,11 @@
 #include <chrono>
 #include <fstream>
 #include <filesystem>
-#include "aux/dijkstra.cpp"
+#include "dijkstra.h"
+#include <omp.h>
 
 void run_optimal_k_tests(int source, int target){
-    const std::string k_tests_folder = "../tests/k_tests/test_";
+    const std::string k_tests_folder = "./tests/fixed_vertices/test_";
     const int num_tests = 15; 
 
     // Read all graphs into memory
@@ -16,33 +17,35 @@ void run_optimal_k_tests(int source, int target){
         graphs.push_back(graph);
     }
 
+    // MonoThread program for more time consistency
+    omp_set_num_threads(1);
+
     // Setup output file
-    std::ofstream output ("../outputs/optimal_k_tests.csv", std::ios::trunc);
-    output << " k   I   D   U   T(ms) " << std::endl;
+    std::ofstream output("./outputs/optimal_k_tests.csv", std::ios::trunc);
+    output << "k, Avg_T(ms)" << std::endl;
 
     // Run Dijkstra tests/benchmarks
     for (int k = 2; k <= 128; k += 1) {
-        int inserts = 0, deletemins = 0, updates = 0;
-        auto start = std::chrono::high_resolution_clock::now(); // Start timer
+        long long total_duration = 0;
+        int repetitions = 30;
 
-        #pragma omp parallel for reduction(+:inserts, deletemins, updates)
-        for (int j = 0; j < num_tests; j++) {
-            DijkstraResult result = dijkstra(graphs[j], source, target, k);
-            inserts += result.inserts;
-            deletemins += result.deletemins;
-            updates += result.updates;
+        for (int repeats = 0; repeats < repetitions; repeats++) {
+            auto start = std::chrono::high_resolution_clock::now();
+
+            for (int j = 0; j < num_tests; j++) {
+                dijkstra(graphs[j], source, target, k); // Run Dijkstra, ignore operation counts
+            }
+
+            auto end = std::chrono::high_resolution_clock::now();
+            auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+            total_duration += duration;
         }
 
-
-        auto end = std::chrono::high_resolution_clock::now(); 
-        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+        double avg_duration = static_cast<double>(total_duration) / repetitions;
 
         // Write results to the output file
-        output << k << ","
-               << inserts << ","
-               << deletemins << ","
-               << updates << ","
-               << duration << "\n";
+        output << k << "," << avg_duration << "\n";
+        std::cout << "k=" << k << " tested, Avg Time: " << avg_duration << "ms" << std::endl << std::flush;
     }
 }
 

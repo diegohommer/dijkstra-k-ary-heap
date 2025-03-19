@@ -1,16 +1,4 @@
-#include <vector>
-#include <limits>
-#include <iostream>
-
-#include "graph.cpp"
-#include "heap.cpp"
-
-struct DijkstraResult {
-    int shortest_distance;
-    int inserts;
-    int deletemins;
-    int updates;
-};
+#include "dijkstra.h"
 
 DijkstraResult dijkstra(Graph graph, int source_vertex, int destiny_vertex, int k){
     int num_verts = graph.get_total_vertices();
