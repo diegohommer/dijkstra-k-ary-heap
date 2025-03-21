@@ -27,7 +27,7 @@ private:
     unsigned num_vertices_;
     unsigned num_edges_;
 
-    void resize(unsigned n);
+    void resize(int n);
 };
 
 #endif // GRAPH_H

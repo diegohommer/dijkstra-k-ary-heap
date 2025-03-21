@@ -11,11 +11,11 @@ void Graph::read_dimacs(std::istream& in) {
     // (1) get nodes and edges
     std::stringstream linestr;
     linestr.str(line);
-    unsigned n, m;
-    linestr >> dummy >> dummy >> n >> m;
-    resize(n);
+    linestr >> dummy >> dummy >> num_vertices_ >> num_edges_;
+
+    resize(num_vertices_);
     unsigned i=0;
-    while (getline(in,line) && i < m) {
+    while (getline(in,line) && i < num_edges_) {
         if (line.substr(0,2) == "a ") {
             std::stringstream arc(line);
             unsigned u,v,w;
@@ -49,6 +49,6 @@ void Graph::add_symetric_edge(int u, int v, int weight) {
     adjacency_list[v].push_back(Edge{u, weight});
 }
 
-void Graph::resize(unsigned n) {
+void Graph::resize(int n) {
     adjacency_list.resize(n);
 }

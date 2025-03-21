@@ -1,30 +1,21 @@
 #!/bin/bash
 
 # Fixed number of vertices
-n=5000
-j=1
+n=8192
 folder="fixed_vertices"
+j=1
 
-# Sparse graphs (m ~ 10n)
-for i in $(seq 1 5); do
-    p=$(echo "scale=6; $i * 0.00001" | bc)  # p = 0.00001, 0.00002, ..., 0.00005
-    echo "Generating sparse graph with p = $p"
-    ./gen.out $n $p $j $folder
-    j=$((j + 1))
-done
+# Start with sqrt(2)^20 and increase by a consistent factor for each step
+initial_m=$(echo "scale=0; 2^(15)" | bc -l)  # Starting m = sqrt(2)^20
+factor=$(echo "scale=6; sqrt(2)" | bc)  # Factor to increase m in each step (sqrt(2))
 
-# Mid-density graphs (m ~ 10n^1.5)
-for i in $(seq 1 5); do
-    p=$(echo "scale=6; $i * 0.001" | bc)  # p = 0.001, 0.002, ..., 0.005
-    echo "Generating mid-density graph with p = $p"
+# Generate graphs with unique steps between m values
+m=$initial_m
+for (( k=20; k<=29; k++ )); do
+    m=$(echo "scale=0; $m * $factor" | bc)
+    p=$(echo "scale=6; $m / ($n * $n)" | bc)
+    floored_m=$(printf "%.0f" "$m")
+    echo "Generating graph with n = $n, p = $p (m = $floored_m)"
     ./gen.out $n $p $j $folder
-    j=$((j + 1))
-done
-
-# Dense graphs (m ~ 0.1n^2)
-for i in $(seq 1 5); do
-    p=$(echo "scale=6; $i * 0.02" | bc)  # p = 0.02, 0.04, ..., 0.1
-    echo "Generating dense graph with p = $p"
-    ./gen.out $n $p $j $folder
-    j=$((j + 1))
+    ((j++))
 done

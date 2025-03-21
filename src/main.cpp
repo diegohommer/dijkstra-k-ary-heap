@@ -46,8 +46,8 @@ void run_correctness_test() {
 /**
  * @brief Benchmarks Dijkstra's algorithm for different values of `k`.
  *
- * Reads graphs from `./data/graphs/fixed_vertices/test_*.csv`, runs Dijkstra for `k` values from 2 to 128,
- * and records the average execution time over 30 repetitions. Results are saved to `./data/outputs/test.csv`.
+ * Reads graphs from `./data/graphs/varied/test_*.csv`, runs Dijkstra for `k` values from 2 to 128,
+ * and records the average execution time over 30 repetitions. Results are saved to `./data/outputs/optimal_k_tests.csv`.
  *
  * @param source Source vertex for Dijkstra.
  * @param target Target vertex for Dijkstra.
@@ -57,13 +57,13 @@ void run_correctness_test() {
  * - Overwrites `./data/outputs/optimal_k_tests.csv` if it exists.
  */
 void run_optimal_k_tests(int source, int target);void run_optimal_k_tests(int source, int target){
-    const std::string k_tests_folder = "./data/graphs/fixed_vertices/test_";
-    const int num_tests = 15; 
+    const std::string varied_folder = "./data/graphs/varied/test_";
+    const int num_tests = 18; 
 
     // Read all graphs into memory
     std::vector<Graph> graphs;
     for (int j = 1; j <= num_tests; j++) {
-        std::ifstream input(k_tests_folder + std::to_string(j) + ".csv");
+        std::ifstream input(varied_folder + std::to_string(j) + ".csv");
         Graph graph;
         graph.read_dimacs(input);
         graphs.push_back(graph);
@@ -102,35 +102,38 @@ void run_optimal_k_tests(int source, int target);void run_optimal_k_tests(int so
 }
 
 
+/**
+ * @brief Benchmarks Dijkstra's algorithm computing the number of Inserts, Delemins and Updates done by the Heap.
+ *
+ * Reads graphs from `./data/graphs/varied/test_*.csv`, runs Dijkstra on each one of them,
+ * recording the number of Inserts (I), Delemins (D), Updates (U) and execution time (T) over 30 repetitions. 
+ * Results are saved to `./data/outputs/dijkstra_ops.csv`.
+ *
+ * @param source Source vertex for Dijkstra.
+ * @param target Target vertex for Dijkstra.
+ *
+ * @note
+ * - Sets OpenMP threads to 1 for consistent timing.
+ * - Overwrites `./data/outputs/dijkstra_ops.csv` if it exists.
+ */
 void run_dijkstra_ops_tests(int source, int target){
-    const std::string v_tests_folder = "./data/graphs/fixed_vertices/test_";
-    const std::string e_tests_folder = "./data/graphs/fixed_edges/test_";
-    const int num_tests = 7; 
-
-    // Read all graphs into memory
-    std::vector<Graph> graphs;
-    for (int j = 1; j <= num_tests; j++) {
-        std::ifstream input_v(v_tests_folder + std::to_string(j) + ".csv");
-        Graph graph;
-        graph.read_dimacs(input_v);
-        graphs.push_back(graph);
-    }
-    for (int j = 1; j <= num_tests; j++) {
-        std::ifstream input_e(e_tests_folder + std::to_string(j) + ".csv");
-        Graph graph;
-        graph.read_dimacs(input_e);
-        graphs.push_back(graph);
-    }
+    const std::string varied_folder = "./data/graphs/fixed_vertices/test_";
+    const int num_tests = 10; 
 
     // Setup output file
     std::ofstream output("./data/outputs/dijkstra_ops_tests.csv", std::ios::trunc);
     output << "n  m  I  D  U " << std::endl;
 
-    for (int j = 0; j < (2*num_tests); j++) {
-        DijkstraResult result = dijkstra(graphs[j], source, target, OPTIMAL_K); 
+    for (int j = 1; j <= num_tests; j++) {
+        std::ifstream input(varied_folder + std::to_string(j) + ".csv");
+        Graph graph;
+        graph.read_dimacs(input);
 
-        output << graphs[j].get_total_vertices() << " "
-               << graphs[j].get_total_edges() << " "
+        DijkstraResult result = dijkstra(graph, source, target, OPTIMAL_K); 
+
+        std::cout << "Graph " << std::to_string(j) << " Tested!" << std::endl;
+        output << graph.get_total_vertices() << " "
+               << graph.get_total_edges() << " "
                << result.inserts << " "
                << result.deletemins << " "
                << result.updates << " "
@@ -171,5 +174,8 @@ int main(int argc, char const *argv[])
     int source = std::stoi(argv[1]) - 1; 
     int target = std::stoi(argv[2]) - 1; 
 
-    return run_dijkstra(source, target);
+    run_dijkstra_ops_tests(source, target);
+    return 0;
+
+    //return run_dijkstra(source, target);
 }
