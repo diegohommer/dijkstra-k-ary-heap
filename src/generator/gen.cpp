@@ -32,10 +32,11 @@ typedef graph_traits<Graph>::vertex_descriptor Node;
 typedef graph_traits<Graph>::edge_descriptor Edge;
 
 int main(int argc, char *argv[]) {
-  assert(argc == 4);
+  assert(argc == 5);
   unsigned n = atoi(argv[1]);
   double p = atof(argv[2]);
   std::string i = argv[3];
+  std::string folder = argv[4];
 
   srand48(time(0));
 
@@ -62,7 +63,7 @@ int main(int argc, char *argv[]) {
   cerr << "Distance between " << src + 1 << " and " << dst + 1 << " is " << dist[dst] << endl;
 
   // (3) Generate dynamic filename
-  std::string filename = "../../tests/k_tests/test_" + i + ".csv";
+  std::string filename = "../data/graphs/" + folder + "/test_" + i + ".csv";
   
   // Open file for writing
   std::ofstream output(filename);

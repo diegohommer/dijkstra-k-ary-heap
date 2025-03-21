@@ -1,6 +1,6 @@
 #include "heap.h"
 
-KHeap::KHeap(int total_vertices, int new_k) : pos(total_vertices, -1), k(new_k) {}
+KHeap::KHeap(int total_vertices, int new_k, bool count_sifts = false) : pos(total_vertices, -1), k(new_k), count_sifts(count_sifts) {}
 
 int KHeap::get_vertex_dist(int vertex){
     if (pos[vertex] == -1) { 

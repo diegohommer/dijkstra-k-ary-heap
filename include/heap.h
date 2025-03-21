@@ -14,7 +14,7 @@ struct HeapNode {
 
 class KHeap {
 public:
-    KHeap(int total_vertices, int new_k);
+    KHeap(int total_vertices, int new_k, bool count_sifts);
 
     int get_vertex_dist(int vertex);
     HeapNode deletemin();
@@ -23,6 +23,7 @@ public:
     int get_size();
 private:
     int k;
+    bool count_sifts;
     std::vector<HeapNode> heap;
     std::vector<int> pos;
 

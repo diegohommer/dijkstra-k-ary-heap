@@ -10,7 +10,7 @@ DijkstraResult dijkstra(Graph graph, int source_vertex, int destiny_vertex, int 
     distances[0] = 0;
 
     // Initialize priority queue
-    KHeap priority_queue(num_verts,k);
+    KHeap priority_queue(num_verts,k,false);
     priority_queue.insert(source_vertex, 0);
     inserts++;
 

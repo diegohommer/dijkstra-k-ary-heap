@@ -102,6 +102,64 @@ void run_optimal_k_tests(int source, int target);void run_optimal_k_tests(int so
 }
 
 
+void run_dijkstra_ops_tests(int source, int target){
+    const std::string v_tests_folder = "./data/graphs/fixed_vertices/test_";
+    const std::string e_tests_folder = "./data/graphs/fixed_edges/test_";
+    const int num_tests = 7; 
+
+    // Read all graphs into memory
+    std::vector<Graph> graphs;
+    for (int j = 1; j <= num_tests; j++) {
+        std::ifstream input_v(v_tests_folder + std::to_string(j) + ".csv");
+        Graph graph;
+        graph.read_dimacs(input_v);
+        graphs.push_back(graph);
+    }
+    for (int j = 1; j <= num_tests; j++) {
+        std::ifstream input_e(e_tests_folder + std::to_string(j) + ".csv");
+        Graph graph;
+        graph.read_dimacs(input_e);
+        graphs.push_back(graph);
+    }
+
+    // Setup output file
+    std::ofstream output("./data/outputs/dijkstra_ops_tests.csv", std::ios::trunc);
+    output << "n  m  I  D  U " << std::endl;
+
+    for (int j = 0; j < (2*num_tests); j++) {
+        DijkstraResult result = dijkstra(graphs[j], source, target, OPTIMAL_K); 
+
+        output << graphs[j].get_total_vertices() << " "
+               << graphs[j].get_total_edges() << " "
+               << result.inserts << " "
+               << result.deletemins << " "
+               << result.updates << " "
+               << std::endl;
+    }
+}
+
+
+int run_dijkstra(int source, int target){
+    // Read graph from stdin
+    Graph graph;
+    graph.read_dimacs(std::cin);
+
+    if(source >= graph.get_total_vertices() || target >= graph.get_total_vertices()){
+        std::cout << "Out of bounds vertex! Range is 0 to" + std::to_string(graph.get_total_vertices()-1) << std::endl;
+        return -1;
+    }
+
+    int shortest_path = dijkstra(graph,source,target,OPTIMAL_K).shortest_distance;
+    
+    if (shortest_path == std::numeric_limits<int>::max()) {
+        std::cout << "inf" << std::endl;
+    } else {
+        std::cout << shortest_path << std::endl;
+    }
+
+    return 0;
+}
+
 int main(int argc, char const *argv[])
 {    
     if (argc != 3) {
@@ -113,14 +171,5 @@ int main(int argc, char const *argv[])
     int source = std::stoi(argv[1]) - 1; 
     int target = std::stoi(argv[2]) - 1; 
 
-    // run_optimal_k_tests(source, target);
-    // run_correctness_test();
-    
-    // if (shortest_path == std::numeric_limits<int>::max()) {
-    //     std::cout << "inf" << std::endl;
-    // } else {
-    //     std::cout << shortest_path << std::endl;
-    // }
-    
-    return 0;
+    return run_dijkstra(source, target);
 }
