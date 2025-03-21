@@ -35,6 +35,5 @@
 .vscode
 
 # Folders
-bin/
 obj/
 data/

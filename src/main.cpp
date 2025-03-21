@@ -10,6 +10,40 @@
 const int OPTIMAL_K = 8;
 
 /**
+ * @brief Tests the correctness of the Dijkstra algorithm implementation.
+ *
+ * Runs Dijkstra's algorithm on a predefined graph and compares the computed shortest distances
+ * from vertex 0 to all other vertices with the expected results. If any computed distance does
+ * not match the expected value, the program will terminate with an assertion error.
+ * Example graph available at <https://www.researchgate.net/figure/Example-Graph-for-dynamic-Dijkstra-algorithm_fig5_323578961>
+ */
+void run_correctness_test() {
+    Graph graph(8,28);
+
+    graph.add_symetric_edge(0, 1, 2);
+    graph.add_symetric_edge(0, 3, 7);
+    graph.add_symetric_edge(0, 5, 12);
+    graph.add_symetric_edge(0, 6, 2);
+    graph.add_symetric_edge(1, 2, 1);
+    graph.add_symetric_edge(1, 3, 4);
+    graph.add_symetric_edge(1, 4, 3);
+    graph.add_symetric_edge(1, 6, 5);
+    graph.add_symetric_edge(2, 4, 4);
+    graph.add_symetric_edge(2, 6, 4);
+    graph.add_symetric_edge(3, 4, 4);
+    graph.add_symetric_edge(3, 7, 5);
+    graph.add_symetric_edge(4, 7, 7);
+    graph.add_symetric_edge(5, 7, 3);
+
+    int true_min_distances[8] = {0, 2, 3, 6, 5, 12, 2, 11};
+    for(int i = 0; i < 8; i++){
+        int result_min_distance = dijkstra(graph, 0, i, OPTIMAL_K).shortest_distance;
+        assert(result_min_distance == true_min_distances[i]);
+    }
+}
+
+
+/**
  * @brief Benchmarks Dijkstra's algorithm for different values of `k`.
  *
  * Reads graphs from `./data/graphs/fixed_vertices/test_*.csv`, runs Dijkstra for `k` values from 2 to 128,
@@ -67,35 +101,6 @@ void run_optimal_k_tests(int source, int target);void run_optimal_k_tests(int so
     }
 }
 
-void run_correctness_tests() {
-    Graph graph(8,28);
-
-    graph.add_symetric_edge(0, 1, 2);
-    graph.add_symetric_edge(0, 3, 7);
-    graph.add_symetric_edge(0, 5, 12);
-    graph.add_symetric_edge(0, 6, 2);
-
-    graph.add_symetric_edge(1, 2, 1);
-    graph.add_symetric_edge(1, 3, 4);
-    graph.add_symetric_edge(1, 4, 3);
-    graph.add_symetric_edge(1, 6, 5);
-
-    graph.add_symetric_edge(2, 4, 4);
-    graph.add_symetric_edge(2, 6, 4);
-
-    graph.add_symetric_edge(3, 4, 4);
-    graph.add_symetric_edge(3, 7, 5);
-
-    graph.add_symetric_edge(4, 7, 7);
-
-    graph.add_symetric_edge(5, 7, 3);
-
-    int true_min_distances[8] = {0, 2, 3, 6, 5, 12, 2, 11};
-    for(int i = 0; i < 8; i++){
-        int result_min_distance = dijkstra(graph, 0, i, OPTIMAL_K).shortest_distance;
-        assert(result_min_distance == true_min_distances[i]);
-    }
-}
 
 int main(int argc, char const *argv[])
 {    
@@ -109,7 +114,7 @@ int main(int argc, char const *argv[])
     int target = std::stoi(argv[2]) - 1; 
 
     // run_optimal_k_tests(source, target);
-    run_correctness_tests();
+    // run_correctness_test();
     
     // if (shortest_path == std::numeric_limits<int>::max()) {
     //     std::cout << "inf" << std::endl;
