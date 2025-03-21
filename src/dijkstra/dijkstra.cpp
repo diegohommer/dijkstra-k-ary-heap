@@ -19,6 +19,7 @@ DijkstraResult dijkstra(Graph graph, int source_vertex, int destiny_vertex, int 
         HeapNode current = priority_queue.deletemin();
         int v = current.vertex;
         int v_min = current.dist;
+        distances[v] = v_min;
         deletemins++;
 
         visited[v] = true;

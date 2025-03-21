@@ -1,5 +1,8 @@
 #include "graph.h"
 
+Graph::Graph() {};
+Graph::Graph(int n, int m) : num_vertices_(n), num_edges_(m) {resize(n);};
+
 void Graph::read_dimacs(std::istream& in) {
     std::string line = "", dummy;
     while (line.substr(0, 4) != "p sp")
@@ -37,6 +40,11 @@ int Graph::get_total_edges() {
 
 void Graph::add_edge(int origin, int destiny, int weight) {
     adjacency_list[origin].push_back(Edge{destiny, weight});
+}
+
+void Graph::add_symetric_edge(int u, int v, int weight) {
+    adjacency_list[u].push_back(Edge{v, weight});
+    adjacency_list[v].push_back(Edge{u, weight});
 }
 
 void Graph::resize(unsigned n) {

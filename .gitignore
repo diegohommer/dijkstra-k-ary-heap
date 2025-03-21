@@ -35,4 +35,6 @@
 .vscode
 
 # Folders
-plots/
+bin/
+obj/
+data/
