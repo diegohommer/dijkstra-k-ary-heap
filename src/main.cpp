@@ -103,42 +103,68 @@ void run_optimal_k_tests(int source, int target);void run_optimal_k_tests(int so
 
 
 /**
- * @brief Benchmarks Dijkstra's algorithm computing the number of Inserts, Delemins and Updates done by the Heap.
+ * @brief Benchmarks Dijkstra's algorithm, recording Inserts, Delemins, Updates, and execution time.
  *
- * Reads graphs from `./data/graphs/varied/test_*.csv`, runs Dijkstra on each one of them,
- * recording the number of Inserts (I), Delemins (D), Updates (U) and execution time (T) over 30 repetitions. 
- * Results are saved to `./data/outputs/dijkstra_ops.csv`.
+ * Reads graphs from `./data/graphs/<folder_name>/test_*.csv`, runs Dijkstra on each graph over 60 repetitions, 
+ * and records the number of Inserts (I), Delemins (D), Updates (U), and execution time (T) in milliseconds. 
+ * Results are saved to `./data/outputs/dijkstra_<folder_name>.csv`.
  *
  * @param source Source vertex for Dijkstra.
  * @param target Target vertex for Dijkstra.
+ * @param folder_name Name of the folder containing the graph files.
  *
  * @note
- * - Sets OpenMP threads to 1 for consistent timing.
- * - Overwrites `./data/outputs/dijkstra_ops.csv` if it exists.
+ * - Uses a single OpenMP thread for consistent timing.
+ * - Overwrites the output file if it exists.
  */
-void run_dijkstra_ops_tests(int source, int target){
-    const std::string varied_folder = "./data/graphs/fixed_vertices/test_";
+void run_dijkstra_fixed_tests(int source, int target, std::string folder_name){
     const int num_tests = 10; 
+    const int repetitions = 60;
+
+    // MonoThread program for more time consistency
+    omp_set_num_threads(1);
 
     // Setup output file
-    std::ofstream output("./data/outputs/dijkstra_ops_tests.csv", std::ios::trunc);
-    output << "n  m  I  D  U " << std::endl;
+    std::ofstream output("./data/outputs/dijkstra_" + folder_name + ".csv", std::ios::trunc);
+    output << "n, m, I, D, U, T(ms)" << std::endl;
 
     for (int j = 1; j <= num_tests; j++) {
-        std::ifstream input(varied_folder + std::to_string(j) + ".csv");
+        long long total_duration = 0;
+        int inserts = 0, deletemins = 0, updates = 0;
+
+        std::ifstream input("./data/graphs/" + folder_name + "/test_" + std::to_string(j) + ".csv");
         Graph graph;
         graph.read_dimacs(input);
 
-        DijkstraResult result = dijkstra(graph, source, target, OPTIMAL_K); 
+        for (int repetition = 0; repetition < repetitions; repetition++){
+            auto start = std::chrono::high_resolution_clock::now();
+            DijkstraResult result = dijkstra(graph, source, target, OPTIMAL_K);
+            auto end = std::chrono::high_resolution_clock::now();
+
+            auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+            total_duration += duration; 
+            inserts += result.inserts;
+            deletemins += result.deletemins;
+            updates += result.updates;
+        }
 
         std::cout << "Graph " << std::to_string(j) << " Tested!" << std::endl;
-        output << graph.get_total_vertices() << " "
-               << graph.get_total_edges() << " "
-               << result.inserts << " "
-               << result.deletemins << " "
-               << result.updates << " "
-               << std::endl;
+        output << graph.get_total_vertices() << ","
+               << graph.get_total_edges() << ","
+               << inserts << ","
+               << deletemins << ","
+               << updates << ","
+               << total_duration << std::endl;
     }
+}
+
+
+void run_dijkstra_fixed_v_tests(int source, int target){
+    run_dijkstra_fixed_tests(source, target, "fixed_vertices");
+}
+
+void run_dijkstra_fixed_e_tests(int source, int target){
+    run_dijkstra_fixed_tests(source, target, "fixed_edges");
 }
 
 
@@ -174,7 +200,7 @@ int main(int argc, char const *argv[])
     int source = std::stoi(argv[1]) - 1; 
     int target = std::stoi(argv[2]) - 1; 
 
-    run_dijkstra_ops_tests(source, target);
+    run_dijkstra_fixed_e_tests(source, target);
     return 0;
 
     //return run_dijkstra(source, target);
