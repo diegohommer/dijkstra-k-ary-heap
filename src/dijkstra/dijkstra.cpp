@@ -1,6 +1,6 @@
 #include "dijkstra.h"
 
-DijkstraResult dijkstra(Graph graph, int source_vertex, int destiny_vertex, int k){
+DijkstraResult dijkstra(Graph graph, int source_vertex, int destiny_vertex, int k, bool count_sifts){
     int num_verts = graph.get_total_vertices();
     int inserts = 0, deletemins = 0, updates = 0;
 
@@ -10,7 +10,7 @@ DijkstraResult dijkstra(Graph graph, int source_vertex, int destiny_vertex, int 
     distances[0] = 0;
 
     // Initialize priority queue
-    KHeap priority_queue(num_verts,k,false);
+    KHeap priority_queue(num_verts,k,count_sifts);
     priority_queue.insert(source_vertex, 0);
     inserts++;
 
@@ -43,5 +43,14 @@ DijkstraResult dijkstra(Graph graph, int source_vertex, int destiny_vertex, int 
         }
     }
 
-    return DijkstraResult{distances[destiny_vertex],inserts,deletemins,updates};
+    if(count_sifts){
+        return DijkstraResult{
+            distances[destiny_vertex],inserts,deletemins,updates,
+            priority_queue.get_insert_r_values(),
+            priority_queue.get_deletemin_r_values(),
+            priority_queue.get_update_r_values()
+        };
+    }else{
+        return DijkstraResult{distances[destiny_vertex],inserts,deletemins,updates};
+    }
 }

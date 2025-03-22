@@ -9,7 +9,7 @@ CXX = g++
 CXXFLAGS = -std=c++17 -O2 -fopenmp -I$(IDIR)
 
 ## Source files
-MAIN_SRC = $(SDIR)/main.cpp $(SDIR)/dijkstra/dijkstra.cpp $(SDIR)/dijkstra/graph.cpp $(SDIR)/dijkstra/heap.cpp
+MAIN_SRC = $(SDIR)/main.cpp $(SDIR)/memory_utils.cpp $(SDIR)/dijkstra/dijkstra.cpp $(SDIR)/dijkstra/graph.cpp $(SDIR)/dijkstra/heap.cpp
 GEN_SRC = $(SDIR)/generator/gen.cpp
 
 ## Object files

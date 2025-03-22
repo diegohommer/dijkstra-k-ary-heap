@@ -1,6 +1,7 @@
 #include "heap.h"
+#include <iostream>
 
-KHeap::KHeap(int total_vertices, int new_k, bool count_sifts = false) : pos(total_vertices, -1), k(new_k), count_sifts(count_sifts) {}
+KHeap::KHeap(int total_vertices, int new_k, bool count_sifts) : pos(total_vertices, -1), k(new_k), count_sifts(count_sifts) {}
 
 int KHeap::get_vertex_dist(int vertex){
     if (pos[vertex] == -1) { 
@@ -11,23 +12,43 @@ int KHeap::get_vertex_dist(int vertex){
 
 HeapNode KHeap::deletemin(){
     HeapNode min = heap.front();
-    swap_nodes(0, heap.size()-1);
+    swap_nodes(0, heap.size() - 1);
     pos[min.vertex] = -1;
     heap.pop_back();
-    heapify_down(0);
+
+    if (heap.size() > 1) {
+        int sift_down_count = heapify_down(0);
+        if (count_sifts) {
+            double r = static_cast<double>(sift_down_count) / logk(heap.size());
+            deletemin_r_values.push_back(r);
+        }
+    }
+
     return min;
 }
 
 void KHeap::update(int vertex, int dist){
     int vertex_index = pos[vertex];
-    heap[vertex_index] = HeapNode{vertex,dist};
-    heapify_up(vertex_index);
+    heap[vertex_index] = HeapNode{vertex, dist};
+    int sift_up_count = heapify_up(vertex_index);
+
+    if (count_sifts) {
+        double r = static_cast<double>(sift_up_count) / logk(heap.size());
+        update_r_values.push_back(r);
+    }
 }
 
 void KHeap::insert(int vertex, int dist){
-    heap.push_back(HeapNode{vertex,dist});
-    pos[vertex] = heap.size()-1;
-    heapify_up(heap.size()-1);
+    heap.push_back(HeapNode{vertex, dist});
+    pos[vertex] = heap.size() - 1;
+
+    if (heap.size() > 1) {
+        int sift_up_count = heapify_up(heap.size() - 1);
+        if (count_sifts) {
+            double r = static_cast<double>(sift_up_count) / logk(heap.size());
+            insert_r_values.push_back(r);
+        }
+    }
 }
 
 int KHeap::get_size(){
@@ -42,21 +63,25 @@ void KHeap::swap_nodes(int index, int index2){
     std::swap(pos[v1], pos[v2]);            // Swap hash indexes
 }
 
-void KHeap::heapify_up(int index) {
+int KHeap::heapify_up(int index) {
+    int sift_counter = 0;
     while(index > 0){
         int parent = (index - 1) / k;
 
         if(heap[index] < heap[parent]){
             swap_nodes(index,parent);
+            if(count_sifts) sift_counter++;
             index = parent;
         }else{
             break;
         }
     }
+    return sift_counter;
 }
 
-void KHeap::heapify_down(int index) {
-    while(true){
+int KHeap::heapify_down(int index) {
+    int sift_counter = 0;
+    while (index < heap.size()){
         int min = index;
 
         for (int i = 1; i <= k; i++) {
@@ -68,9 +93,15 @@ void KHeap::heapify_down(int index) {
 
         if(min != index){
             swap_nodes(index,min);
+            if(count_sifts) sift_counter++;
             index = min;
         }else{
             break;
         }
     }
+    return sift_counter;
+}
+
+double KHeap::logk(double n) {
+    return ceil(std::log(n) / std::log(this->k));
 }

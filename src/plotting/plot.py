@@ -23,40 +23,84 @@ def plot_optimal_k():
     plt.xticks(np.arange(min(k_values), max(k_values)+1, step=4)) 
     plt.legend()
 
-def plot_heap_ops():
+def plot_dijkstra_benchmark(fixed_type):
     i_values = []
     d_values = []
     u_values = []
-    m_values = []  # To keep track of varying m values
-
-    # Open the CSV file to read the data
-    with open('../../data/outputs/dijkstra_ops_tests.csv', newline='') as csvfile:
+    x_values = []  # Stores either n or m, depending on what is varying
+    t_values = []  # Stores normalized execution time
+    
+    # Determine filename and x-axis label based on fixed_type
+    if fixed_type == "vertices":
+        filename = "../../data/outputs/dijkstra_fixed_vertices.csv"
+        xlabel = "m (Number of edges)"
+    elif fixed_type == "edges":
+        filename = "../../data/outputs/dijkstra_fixed_edges.csv"
+        xlabel = "n (Number of vertices)"
+    else:
+        raise ValueError("Invalid fixed_type. Use 'vertices' or 'edges'.")
+    
+    with open(filename, newline='') as csvfile:
         csvreader = csv.reader(csvfile)
         next(csvreader)  # Skip header row
         for row in csvreader:
             n_value = int(row[0])  
             m_value = int(row[1])  
-            i_values.append(float(row[2])/(30*n_value))  # Normalize insert operations
-            d_values.append(float(row[3])/(30*n_value))  # Normalize delete operations
-            u_values.append(float(row[4])/(30*m_value))  # Normalize update operations
-            m_values.append(m_value)
-
-    # Plotting the data
-    plt.figure(figsize=(10, 6))
-    plt.plot(m_values, i_values, label="Insert Operations", marker='o')
-    plt.plot(m_values, d_values, label="Delete Operations", marker='s')
-    plt.plot(m_values, u_values, label="Update Operations", marker='^')
+            i_value = float(row[2])
+            d_value = float(row[3])
+            u_value = float(row[4])
+            t_value = float(row[5])  # Execution time (T)
+            
+            # Determine which variable is the x-axis
+            x_value = m_value if fixed_type == "vertices" else n_value
+            x_values.append(x_value)
+            
+            # Check if I <= n, D <= n, U <= m
+            if i_value > n_value or d_value > n_value or u_value > m_value:
+                print(f"Invalid data for n={n_value}, m={m_value}: I={i_value}, D={d_value}, U={u_value}")
+            
+            # Normalize operations
+            i_values.append(i_value / n_value)
+            d_values.append(d_value / n_value)
+            u_values.append(u_value / m_value)
+            
+            # Normalize execution time T / ((n + m) * log(n))
+            t_normalized = t_value / ((n_value + m_value) * np.log(n_value))
+            t_values.append(t_normalized)
     
-    plt.xlabel('m (Number of edges)')
+    # Plotting the operations and execution time
+    plt.figure(figsize=(12, 8))
+    
+    # Subplot for Insert, Delete, and Update operations
+    plt.subplot(2, 1, 1)
+    plt.plot(x_values, i_values, label="Insert Operations", marker='o')
+    plt.plot(x_values, d_values, label="Delete Operations", marker='s')
+    plt.plot(x_values, u_values, label="Update Operations", marker='^')
+    plt.xlabel(xlabel)
     plt.ylabel('Operations per node or edge')
-    plt.title('Heap Operations Analysis with Fixed n')
+    plt.title(f'Heap Operations Analysis with Fixed {"n" if fixed_type == "vertices" else "m"}')
     plt.legend()
     plt.grid(True)
+    
+    # Subplot for Execution Time
+    plt.subplot(2, 1, 2)
+    plt.plot(x_values, t_values, label="Normalized Execution Time (T / ((n + m) * log(n)))", color='red', marker='x')
+    plt.xlabel(xlabel)
+    plt.ylabel('Normalized Execution Time')
+    plt.title(f'Execution Time Analysis with Fixed {"n" if fixed_type == "vertices" else "m"}')
+    plt.legend()
+    plt.grid(True)
+    
     plt.tight_layout()
-
     plt.show()
+
+def plot_fixed_vertices():
+    plot_dijkstra_benchmark("vertices")
+
+def plot_fixed_edges():
+    plot_dijkstra_benchmark("edges")
 
 # Call the function you want to display
 # plot_optimal_k()
-plot_heap_ops() 
+plot_fixed_vertices() 
 plt.show()

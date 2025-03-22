@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # Fixed number of vertices
-n=8192
+n=32768
 folder="fixed_vertices"
 j=1
 
 # Start with sqrt(2)^20 and increase by a consistent factor for each step
-initial_m=$(echo "scale=0; 2^(15)" | bc -l)  # Starting m = sqrt(2)^20
+initial_m=$(echo "scale=0; 2^(20)" | bc -l)  # Starting m = sqrt(2)^20
 factor=$(echo "scale=6; sqrt(2)" | bc)  # Factor to increase m in each step (sqrt(2))
 
 # Generate graphs with unique steps between m values

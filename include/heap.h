@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <limits>
+#include <math.h>
 
 struct HeapNode {
     int vertex;
@@ -21,15 +22,23 @@ public:
     void update(int vertex, int dist);
     void insert(int vertex, int dist);
     int get_size();
+        
+    const std::vector<double>& get_insert_r_values() const { return insert_r_values; }
+    const std::vector<double>& get_deletemin_r_values() const { return deletemin_r_values; }
+    const std::vector<double>& get_update_r_values() const { return update_r_values; }
 private:
     int k;
+    std::vector<double> insert_r_values;
+    std::vector<double> deletemin_r_values;
+    std::vector<double> update_r_values;
     bool count_sifts;
     std::vector<HeapNode> heap;
     std::vector<int> pos;
 
     void swap_nodes(int index, int index2);
-    void heapify_up(int index);
-    void heapify_down(int index);
+    int heapify_up(int index);
+    int heapify_down(int index);
+    double logk(double n);
 };
 
 #endif // KHEAP_H
