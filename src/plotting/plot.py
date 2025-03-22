@@ -6,9 +6,10 @@ def plot_optimal_k():
     k_values = []
     avg_t_values = []
 
-    with open('../../data/outputs/optimal_k_tests.csv', newline='') as csvfile:
+    # Read data from CSV
+    with open('../../data/outputs/optimal_k.csv', newline='') as csvfile:
         csvreader = csv.reader(csvfile)
-        next(csvreader)
+        next(csvreader)  # Skip header row
         for row in csvreader:
             k_values.append(int(row[0]))
             avg_t_values.append(float(row[1]))
@@ -16,12 +17,22 @@ def plot_optimal_k():
     k_values = np.array(k_values)
     avg_t_values = np.array(avg_t_values)
 
-    plt.plot(k_values, avg_t_values, label='Avg_T vs k', color='b')
-    plt.xlabel('k')
-    plt.ylabel('Avg_T(ms)')
-    plt.title('k (k-ary Heap) vs Avg_T(ms)')
-    plt.xticks(np.arange(min(k_values), max(k_values)+1, step=4)) 
-    plt.legend()
+    # Create the plot
+    plt.figure(figsize=(8, 6), dpi=300)
+    plt.plot(k_values, avg_t_values, label='Avg_T vs k', color='b', linewidth=2)
+    plt.xlabel('k', fontsize=12)
+    plt.ylabel('Avg_T(ms)', fontsize=12)
+    plt.title('k (k-ary Heap) vs Avg_T(ms)', fontsize=14)
+    plt.xticks(np.arange(min(k_values), max(k_values)+1, step=8))  # Set x-axis ticks
+    plt.legend(fontsize=12)
+    plt.grid(True, linestyle='--', alpha=0.6)  # Add grid for better readability
+
+    # Remove margins and save the plot
+    plt.savefig('../../data/plots/optimal_k_plot.png', bbox_inches='tight', pad_inches=0, dpi=300)
+    plt.savefig('../../data/plots/optimal_k_plot.pdf', bbox_inches='tight', pad_inches=0)  # Vector format
+
+    # Show the plot
+    plt.show()
 
 def plot_dijkstra_benchmark(fixed_type):
     i_values = []
@@ -49,7 +60,7 @@ def plot_dijkstra_benchmark(fixed_type):
             i_value = float(row[2])
             d_value = float(row[3])
             u_value = float(row[4])
-            t_value = float(row[5])  # Execution time (T)
+            t_value = float(row[5]) / 1000 # Converting ms to s
             
             # Determine which variable is the x-axis
             x_value = m_value if fixed_type == "vertices" else n_value
@@ -102,5 +113,5 @@ def plot_fixed_edges():
 
 # Call the function you want to display
 # plot_optimal_k()
-plot_fixed_vertices() 
+plot_optimal_k() 
 plt.show()
