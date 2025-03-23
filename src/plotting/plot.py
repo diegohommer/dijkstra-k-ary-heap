@@ -29,7 +29,6 @@ def plot_optimal_k():
 
     # Remove margins and save the plot
     plt.savefig('../../data/plots/optimal_k_plot.png', bbox_inches='tight', pad_inches=0, dpi=300)
-    plt.savefig('../../data/plots/optimal_k_plot.pdf', bbox_inches='tight', pad_inches=0)  # Vector format
 
     # Show the plot
     plt.show()
@@ -79,31 +78,29 @@ def plot_dijkstra_benchmark(fixed_type):
             t_normalized = t_value / ((n_value + m_value) * np.log(n_value))
             t_values.append(t_normalized)
     
-    # Plotting the operations and execution time
-    plt.figure(figsize=(12, 8))
-    
-    # Subplot for Insert, Delete, and Update operations
-    plt.subplot(2, 1, 1)
-    plt.plot(x_values, i_values, label="Insert Operations", marker='o')
-    plt.plot(x_values, d_values, label="Delete Operations", marker='s')
-    plt.plot(x_values, u_values, label="Update Operations", marker='^')
-    plt.xlabel(xlabel)
-    plt.ylabel('Operations per node or edge')
-    plt.title(f'Heap Operations Analysis with Fixed {"n" if fixed_type == "vertices" else "m"}')
-    plt.legend()
-    plt.grid(True)
-    
-    # Subplot for Execution Time
-    plt.subplot(2, 1, 2)
-    plt.plot(x_values, t_values, label="Normalized Execution Time (T / ((n + m) * log(n)))", color='red', marker='x')
-    plt.xlabel(xlabel)
-    plt.ylabel('Normalized Execution Time')
-    plt.title(f'Execution Time Analysis with Fixed {"n" if fixed_type == "vertices" else "m"}')
-    plt.legend()
-    plt.grid(True)
-    
-    plt.tight_layout()
-    plt.show()
+        # First plot: Insert, Delete, and Update operations
+        plt.figure(figsize=(8, 6), dpi=300)
+        plt.plot(x_values, i_values, label="Insert Operations", marker='o', linestyle='dashed', linewidth=2, alpha=1.0)
+        plt.plot(x_values, d_values, label="Delete Operations", marker='s', linestyle='solid', color='orange', linewidth=2, alpha=0.75)
+        plt.plot(x_values, u_values, label="Update Operations", marker='^', color='green')
+        plt.xlabel(xlabel)
+        plt.ylabel('Operations per node or edge')
+        plt.title(f'Heap Operations Analysis with Fixed {"n" if fixed_type == "vertices" else "m"}')
+        plt.legend()
+        plt.grid(True)
+        plt.savefig(f'../../data/plots/fixed_{fixed_type}_ops.png', bbox_inches='tight', pad_inches=0, dpi=300)
+        plt.show()
+
+        # Second plot: Execution Time
+        plt.figure(figsize=(8, 6), dpi=300)
+        plt.plot(x_values, t_values, label="Normalized Execution Time (T / ((n + m) * log(n)))", color='red', marker='x')
+        plt.xlabel(xlabel)
+        plt.ylabel('Normalized Execution Time')
+        plt.title(f'Execution Time Analysis with Fixed {"n" if fixed_type == "vertices" else "m"}')
+        plt.legend()
+        plt.grid(True)
+        plt.savefig(f'../../data/plots/fixed_{fixed_type}_time.png', bbox_inches='tight', pad_inches=0, dpi=300)
+        plt.show()
 
 def plot_fixed_vertices():
     plot_dijkstra_benchmark("vertices")
@@ -112,6 +109,4 @@ def plot_fixed_edges():
     plot_dijkstra_benchmark("edges")
 
 # Call the function you want to display
-# plot_optimal_k()
-plot_optimal_k() 
-plt.show()
+plot_fixed_vertices()

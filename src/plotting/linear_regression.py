@@ -8,12 +8,14 @@ data_B = pd.read_csv('../../data/outputs/dijkstra_fixed_edges.csv', sep=',', hea
 
 # Combine data from both files
 data = pd.concat([data_A, data_B])
-print(data)
 
 # Validate the data
 numeric_columns = ['n', 'm', 'I', 'D', 'U', 'T']
 data[numeric_columns] = data[numeric_columns].apply(pd.to_numeric, errors='coerce')
 valid_data = data[(data['I'] <= data['n']) & (data['D'] <= data['n']) & (data['U'] <= data['m']) & (data['T'] > 0)].copy()
+
+# Convert time from milliseconds to seconds
+valid_data['T'] = valid_data['T'] / 1000
 
 # T(n,m) ∼ a(n^b)(m^c)
 # ln(T) = ln(a) + b*ln(n) + c*ln(m)

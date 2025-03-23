@@ -104,6 +104,36 @@ void run_sifts_test(int source, int target){
     }
 }
 
+void run_ops_test(int source, int target){
+    const std::string varied_folder = "./data/graphs/varied/test_";
+    const int num_tests = 18;
+
+    // Read all graphs into memory
+    std::vector<Graph> graphs;
+    for (int j = 1; j <= num_tests; j++) {
+        std::ifstream input(varied_folder + std::to_string(j) + ".csv");
+        Graph graph;
+        graph.read_dimacs(input);
+        graphs.push_back(graph);
+    }
+
+    // Setup output file
+    std::ofstream output("./data/outputs/djikstra_ops.csv", std::ios::trunc);
+    output << "n,m,i,d,u" << std::endl;
+
+    for (int j = 0; j < num_tests; j++) {
+        DijkstraResult result = dijkstra(graphs[j], source, target, OPTIMAL_K, false);
+        int n = graphs[j].get_total_vertices();
+        int m = graphs[j].get_total_edges();
+        double i = (double) result.inserts / (double) n;
+        double d = (double) result.deletemins /  (double) n;
+        double u = (double) result.updates / (double) m;
+    
+        // Write results to the output file
+        output << n << "," << m << "," << i << "," << d << "," << u << std::endl;
+    }
+}
+
 /**
  * @brief Benchmarks Dijkstra's algorithm for different values of `k`.
  *
@@ -322,7 +352,7 @@ int run_dijkstra(int source, int target){
     graph.read_dimacs(std::cin);
 
     if(source >= graph.get_total_vertices() || target >= graph.get_total_vertices()){
-        std::cout << "Out of bounds vertex! Range is 0 to" + std::to_string(graph.get_total_vertices()-1) << std::endl;
+        std::cout << "Out of bounds vertex! Range is 1 to" + std::to_string(graph.get_total_vertices()) << std::endl;
         return -1;
     }
 
@@ -348,8 +378,5 @@ int main(int argc, char const *argv[])
     int source = std::stoi(argv[1]) - 1; 
     int target = std::stoi(argv[2]) - 1; 
 
-    run_sifts_test(source, target);
-    return 0;
-
-    //return run_dijkstra(source, target);
+    return run_dijkstra(source, target);
 }
