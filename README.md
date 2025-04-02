@@ -5,16 +5,16 @@ This project implements and benchmarks Dijkstra's algorithm using various test c
 
 ## Directory Structure
 ```
-include/   # Header files
-src/       # Source files
+include/         # Header files
+src/             # Source files
   ├── dijkstra/  # Implementation of Dijkstra's algorithm and supporting data structures
   ├── generator/ # Graph generation utilities
-obj/       # Compiled object files
+obj/             # Compiled object files
 data/
-  ├── graphs/  # DIMACS Graphs for testing
-  ├── outputs/ # Output .csv files from running tests
-  ├── plots/   # Plot .pngs from running one of the plot.py functions
-bin/       # Executable binaries and bash scripts for generating DIMACS test graphs
+  ├── graphs/    # DIMACS Graphs for testing
+  ├── outputs/   # Output .csv files from running tests
+  ├── plots/     # Plot .pngs from running one of the plot.py functions
+bin/             # Executable binaries and bash scripts for generating DIMACS test graphs
 ```
 
 ## Compilation
